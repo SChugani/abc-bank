@@ -1,9 +1,9 @@
 package com.abc;
 
+import static java.lang.Math.abs;
+
 import java.util.ArrayList;
 import java.util.List;
-
-import static java.lang.Math.abs;
 
 public class Customer {
     private String name;
@@ -48,20 +48,9 @@ public class Customer {
 
     private String statementForAccount(Account a) {
         String s = "";
-
-       //Translate to pretty account type
-        switch(a.getAccountType()){
-            case Account.CHECKING:
-                s += "Checking Account\n";
-                break;
-            case Account.SAVINGS:
-                s += "Savings Account\n";
-                break;
-            case Account.MAXI_SAVINGS:
-                s += "Maxi Savings Account\n";
-                break;
-        }
-
+        
+        s += a.getAccountType();
+        
         //Now total up all the transactions
         double total = 0.0;
         for (Transaction t : a.transactions) {
@@ -75,4 +64,41 @@ public class Customer {
     private String toDollars(double d){
         return String.format("$%,.2f", abs(d));
     }
+    
+    /*Added new feature
+     * This method uses a private helper method containsAcc() to confirm that
+     * the account exists
+     * 
+    */
+    public void transfer(Account from, Account to, Double amount) {
+    	if(getNumberOfAccounts() < 2){
+    		throw new IllegalArgumentException("You must have at least two accounts to transfer.");
+    	} 
+    	if(! containsAcc(from)){
+    		throw new IllegalArgumentException("Your 'from' account is not valid.");
+    	}
+    	if(! containsAcc(to)){
+    		throw new IllegalArgumentException("Your 'to' account is not valid.");
+    	}
+    	
+    	if(from.sumTransactions() < amount){
+    		throw new IllegalArgumentException("Not enough funds in from account.");
+    	}
+    	
+    	from.withdraw(amount);
+    	to.deposit(amount);
+    }
+    
+    
+  /*  private helper method for transfer(). Ideal implementation would ensure account
+   *  identity by overriding the equals() and hashCode() methods Account
+  */
+    private boolean containsAcc(Account acc){
+    	for(Account account : accounts){
+    		if(account.getAccountType().equals(acc.getAccountType()))
+    			return true;
+    	}
+    	return false;
+    }
 }
+
